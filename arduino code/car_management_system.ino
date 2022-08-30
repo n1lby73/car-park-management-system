@@ -149,7 +149,7 @@ void loop() {
     lcd.print("Barrier is close");
     
     Serial.print(car_count += 1);
-    totalcar -= 1;
+    car_space_left -= 1;
 
     digitalWrite(orange, LOW);
     digitalWrite(purple, LOW);
@@ -188,7 +188,7 @@ void loop() {
     lcd.print("Car Park Is Full"); 
 
   }
-  
+
   else if ((key != accepted) && (duration <= 30)){
 
     lcd.clear();
@@ -202,7 +202,7 @@ void loop() {
 
     lcd.clear();
     lcd.setCursor(1,0);
-    lcd.print("Access denied")
+    lcd.print("Access denied");
     
     }
  
