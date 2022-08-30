@@ -22,7 +22,7 @@ int yellow = 6;
 int orange = 7;
 int buzzer = 8;
 
-int total_car = 20;
+int car_space_left = 20;
 int car_count;
 
 int dt = 1000;
@@ -86,10 +86,19 @@ void loop() {
   lcd.print("Car Slot Left:");
 
   lcd.setCursor(14,0);
-  lcd.print(total_car);
+  lcd.print(car_space_left);
   
   lcd.setCursor(0,1);
   lcd.print("Place your ID");
+
+  digitalWrite(trig, LOW);
+  delayMicroseconds(ultrasonic_dt);
+    
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(ultrasonic_dt);
+  digitalWrite(trig, LOW);
+    
+  duration = pulseIn(echo, HIGH);
 
   if ( ! mfrc522.PICC_IsNewCardPresent())
     return;
@@ -99,7 +108,7 @@ void loop() {
 
   getKey(mfrc522.uid.uidByte, mfrc522.uid.size);
 
-  if (key == accepted){
+  if ((key == accepted) && (car_space_left > 0)){
 
     lcd.clear();
     lcd.setCursor(1,0);
@@ -133,29 +142,15 @@ void loop() {
     digitalWrite(yellow, LOW);
     digitalWrite(blue, HIGH);
 
-    delay(stepper_dt);
-
-    while(duration > 20){
-      
-      digitalWrite(trig, LOW);
-      delayMicroseconds(ultrasonic_dt);
-    
-      digitalWrite(trig, HIGH);
-      delayMicroseconds(ultrasonic_dt);
-      digitalWrite(trig, LOW);
-    
-      duration = pulseIn(echo, HIGH);
-    }
-
-    car_count += 1;
-    totalcar -= 1;
-
     delay(dt);
 
     lcd.clear();
     lcd.setCursor(1,1);
     lcd.print("Barrier is close");
     
+    Serial.print(car_count += 1);
+    totalcar -= 1;
+
     digitalWrite(orange, LOW);
     digitalWrite(purple, LOW);
     digitalWrite(yellow, LOW);
@@ -186,13 +181,28 @@ void loop() {
 
   }
 
+  else if ((key == accepted) && (car_space_left <= 0)){
+
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("Car Park Is Full"); 
+
+  }
+  
+  else if ((key != accepted) && (duration <= 30)){
+
+    lcd.clear();
+    lcd.setCursor(0,0);
+    lcd.print("SecurityBreached");
+    digitalWrite(buzzer, HIGH);
+
+  }
+
   else{
 
     lcd.clear();
     lcd.setCursor(1,0);
-    lcd.print("Access denied");
-    lcd.setCursor(1,1);
-    lcd.print("Barrier is open");
+    lcd.print("Access denied")
     
     }
  
