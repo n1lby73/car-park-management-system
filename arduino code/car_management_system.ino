@@ -69,14 +69,17 @@ void setup() {
 }
 
 void getKey(byte *buffer, byte bufferSize) {
+
+  String raw_key;
   
   for (byte i = 0; i < bufferSize; i++) {
 
-    key+=String(buffer[i],HEX);
+    raw_key+=String(buffer[i],HEX);
 
   }
 
-  key.toUpperCase();
+  raw_key.toUpperCase();
+  key = raw_key;
 
 }
 
@@ -197,6 +200,8 @@ void loop() {
     lcd.setCursor(0,0);
     lcd.print("SecurityBreached");
     digitalWrite(buzzer, HIGH);
+    delay(dt);
+    digitalWrite(buzzer,LOW);
 
   }
 
