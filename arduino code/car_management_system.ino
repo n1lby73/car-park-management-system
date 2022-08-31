@@ -29,7 +29,8 @@ int dt = 1000;
 int ultrasonic_dt = 10;
 int stepper_dt = 15;
 
-int duration;
+int distance;
+int travel_time;
 
 LiquidCrystal lcd (rs, en, d0, d1, d2, d3);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
@@ -98,7 +99,8 @@ void loop() {
   delayMicroseconds(ultrasonic_dt);
   digitalWrite(trig, LOW);
     
-  duration = pulseIn(echo, HIGH);
+  travel_time = pulseIn(echo, HIGH);
+  distance = 0.0343 *(time_travel/2);
 
   if ( ! mfrc522.PICC_IsNewCardPresent())
     return;
@@ -189,7 +191,7 @@ void loop() {
 
   }
 
-  else if ((key != accepted) && (duration <= 30)){
+  else if ((key != accepted) && (distance <= 30)){
 
     lcd.clear();
     lcd.setCursor(0,0);
