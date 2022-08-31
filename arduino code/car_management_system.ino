@@ -100,7 +100,7 @@ void loop() {
   digitalWrite(trig, LOW);
     
   travel_time = pulseIn(echo, HIGH);
-  distance = 0.0343 *(time_travel/2);
+  distance = 0.0343 *(travel_time/2);
 
   if ( ! mfrc522.PICC_IsNewCardPresent())
     return;
