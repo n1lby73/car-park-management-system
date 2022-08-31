@@ -39,24 +39,24 @@ void setup() {
 
   SPI.begin();
   mfrc522.PCD_Init();
-  
+
   pinMode(trig, OUTPUT);
   pinMode(echo, INPUT);
-  
+
   pinMode(blue, OUTPUT);
   pinMode(purple, OUTPUT);
   pinMode(yellow, OUTPUT);
   pinMode(orange, OUTPUT);
-  
+
   pinMode(buzzer, OUTPUT);
 
   lcd.begin(16, 2);
-  
+
   Serial.begin(9600);
 
-   for (int i = 0; i <= 23; i++){
+  for (int i = 0; i <= 23; i++) {
 
-    lcd.setCursor(1,0);
+    lcd.setCursor(1, 0);
     lcd.scrollDisplayLeft();
     lcd.print("Automatic Car Management System");
     delay(dt);
@@ -65,16 +65,16 @@ void setup() {
   }
 
   lcd.clear();
-  
+
 }
 
 void getKey(byte *buffer, byte bufferSize) {
 
   String raw_key;
-  
+
   for (byte i = 0; i < bufferSize; i++) {
 
-    raw_key+=String(buffer[i],HEX);
+    raw_key += String(buffer[i], HEX);
 
   }
 
@@ -85,25 +85,41 @@ void getKey(byte *buffer, byte bufferSize) {
 
 void loop() {
 
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("Car Slot Left:");
-
-  lcd.setCursor(14,0);
-  lcd.print(car_space_left);
-  
-  lcd.setCursor(0,1);
-  lcd.print("Place your ID");
-
   digitalWrite(trig, LOW);
   delayMicroseconds(ultrasonic_dt);
-    
+
   digitalWrite(trig, HIGH);
   delayMicroseconds(ultrasonic_dt);
   digitalWrite(trig, LOW);
-    
+
   travel_time = pulseIn(echo, HIGH);
-  distance = 0.0343 *(travel_time/2);
+  distance = 0.0343 * (travel_time / 2);
+
+  Serial.println(distance);
+  delay(dt);
+
+  if (car_space_left <= 0) {
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Car Park Is Full");
+
+  }
+  
+  else{
+    
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Car Slot Left:");
+
+  lcd.setCursor(14, 0);
+  lcd.print(car_space_left);
+
+  lcd.setCursor(0, 1);
+  lcd.print("Place your ID");
+
+  }
+  
 
   if ( ! mfrc522.PICC_IsNewCardPresent())
     return;
@@ -113,12 +129,12 @@ void loop() {
 
   getKey(mfrc522.uid.uidByte, mfrc522.uid.size);
 
-  if ((key == accepted) && (car_space_left > 0)){
+  if ((key == accepted) && (car_space_left > 0)) {
 
     lcd.clear();
-    lcd.setCursor(1,0);
+    lcd.setCursor(1, 0);
     lcd.print("Access granted");
-    lcd.setCursor(1,1);
+    lcd.setCursor(1, 1);
     lcd.print("Barrier is open");
 
     digitalWrite(orange, HIGH);
@@ -134,14 +150,14 @@ void loop() {
     digitalWrite(blue, LOW);
 
     delay(stepper_dt);
-    
+
     digitalWrite(orange, LOW);
     digitalWrite(purple, LOW);
     digitalWrite(yellow, HIGH);
     digitalWrite(blue, LOW);
 
     delay(stepper_dt);
-    
+
     digitalWrite(orange, LOW);
     digitalWrite(purple, LOW);
     digitalWrite(yellow, LOW);
@@ -150,9 +166,9 @@ void loop() {
     delay(dt);
 
     lcd.clear();
-    lcd.setCursor(1,1);
+    lcd.setCursor(1, 1);
     lcd.print("Barrier is close");
-    
+
     Serial.print(car_count += 1);
     car_space_left -= 1;
 
@@ -186,32 +202,42 @@ void loop() {
 
   }
 
-  else if ((key == accepted) && (car_space_left <= 0)){
+  else if ((key == accepted) && (car_space_left<= 0)) {
 
     lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Car Park Is Full"); 
-
+    lcd.setCursor(0, 0);
+    lcd.print("Car Park Is Full");
+    
   }
 
-  else if ((key != accepted) && (distance <= 30)){
+  else if ((key != accepted) && (car_space_left <= 0)) {
 
     lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("SecurityBreached");
-    digitalWrite(buzzer, HIGH);
-    delay(dt);
-    digitalWrite(buzzer,LOW);
-
-  }
-
-  else{
-
-    lcd.clear();
-    lcd.setCursor(1,0);
+    lcd.setCursor(0, 0);
+    lcd.print("Car Park Is Full");
+    
+    lcd.setCursor(1, 0);
     lcd.print("Access denied");
     
-    }
- 
+  }
+//  else if ((key != accepted) && (distance <= 30)) {
+//
+//    lcd.clear();
+//    lcd.setCursor(0, 0);
+//    lcd.print("SecurityBreached");
+//    digitalWrite(buzzer, HIGH);
+//    delay(dt);
+//    digitalWrite(buzzer, LOW);
+//
+//  }
+
+  else {
+
+    lcd.clear();
+    lcd.setCursor(1, 0);
+    lcd.print("Access denied");
+
+  }
+
 }
 
