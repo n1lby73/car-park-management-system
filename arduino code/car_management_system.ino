@@ -45,6 +45,7 @@ int car_count;
 int barrier_state;
 
 int dt = 1000;
+int car_dt = 2000;
 int ultrasonic_dt = 10;
 int stepper_dt = 15;
 
@@ -230,7 +231,7 @@ void loop() {
         
     }
 
-    delay(dt);
+    delay(car_dt);
     Serial.println("car passed");
     
     Serial.println(distance);
