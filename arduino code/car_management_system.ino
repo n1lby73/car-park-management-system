@@ -116,8 +116,6 @@ void loop() {
   travel_time = pulseIn(echo, HIGH);
   distance = 0.0343 * (travel_time / 2);
 
-  Serial.println(barrier_state);
-
   if ((distance <= car_distance) && (barrier_state == 0)) {
     
     Serial.println("alarm");
@@ -209,6 +207,8 @@ void loop() {
     digitalWrite(purple, LOW);
     digitalWrite(yellow, LOW);
     digitalWrite(blue, HIGH);
+
+    delay(dt);
 
     lcd.clear();
     lcd.setCursor(3, 0);
