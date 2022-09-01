@@ -311,6 +311,37 @@ void loop() {
     lcd.setCursor(1, 0);
     lcd.print("Access denied");
 
+    for (int i = 0; i<=5; i++){
+      
+        digitalWrite(trig, LOW);
+        delayMicroseconds(ultrasonic_dt);
+      
+        digitalWrite(trig, HIGH);
+        delayMicroseconds(ultrasonic_dt);
+        digitalWrite(trig, LOW);
+      
+        travel_time = pulseIn(echo, HIGH);
+        distance = 0.0343 * (travel_time / 2);
+
+      if (distance <= car_distance) {
+        
+        Serial.println("alarm");
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("Security Alert");
+        
+        for (int i = 0; i<=5; i++){
+          
+          Serial.println("test");
+          digitalWrite(buzzer, HIGH);
+          delay(dt);
+          digitalWrite(buzzer, LOW);
+          delay(dt);
+       }
+       
+      }
+   }
+    delay(dt);
   }
 
 }
