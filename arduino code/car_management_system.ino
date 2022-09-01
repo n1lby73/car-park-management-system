@@ -23,6 +23,7 @@ int orange = 7;
 int buzzer = 8;
 
 int car_space_left = 20;
+int car_distance = 10;
 int car_count;
 
 int dt = 1000;
@@ -84,7 +85,7 @@ void getKey(byte *buffer, byte bufferSize) {
 }
 
 void loop() {
-
+  
   digitalWrite(trig, LOW);
   delayMicroseconds(ultrasonic_dt);
 
@@ -97,6 +98,25 @@ void loop() {
 
   Serial.println(distance);
   delay(dt);
+
+  if (distance <= car_distance) {
+    
+    Serial.println("alarm");
+    lcd.clear();
+    lcd.setCursor(1, 0);
+    lcd.print("Security Alert");
+    
+    for (int i = 0; i<=5; i++){
+      
+    
+      Serial.println("test");
+      digitalWrite(buzzer, HIGH);
+      delay(dt);
+      digitalWrite(buzzer, LOW);
+      delay(dt);
+   }
+   
+  }
 
   if (car_space_left <= 0) {
 
@@ -166,10 +186,13 @@ void loop() {
     delay(dt);
 
     lcd.clear();
-    lcd.setCursor(1, 1);
-    lcd.print("Barrier is close");
+    lcd.setCursor(3, 0);
+    lcd.print("Barrier Is");
+    lcd.setCursor(5,1);
+    lcd.print("Closing");
 
-    Serial.print(car_count += 1);
+    Serial.print("Number of cars inside is: ");
+    Serial.println(car_count += 1);
     car_space_left -= 1;
 
     digitalWrite(orange, LOW);
@@ -202,11 +225,14 @@ void loop() {
 
   }
 
-  else if ((key == accepted) && (car_space_left<= 0)) {
 
+  else if ((key == accepted) && (car_space_left<= 0)) {
+    
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Car Park Is Full");
+    lcd.setCursor(0, 1);
+    lcd.print("Access granted");
     
   }
 
@@ -216,21 +242,11 @@ void loop() {
     lcd.setCursor(0, 0);
     lcd.print("Car Park Is Full");
     
-    lcd.setCursor(1, 0);
+    lcd.setCursor(0, 1);
     lcd.print("Access denied");
     
   }
-//  else if ((key != accepted) && (distance <= 30)) {
-//
-//    lcd.clear();
-//    lcd.setCursor(0, 0);
-//    lcd.print("SecurityBreached");
-//    digitalWrite(buzzer, HIGH);
-//    delay(dt);
-//    digitalWrite(buzzer, LOW);
-//
-//  }
-
+  
   else {
 
     lcd.clear();
@@ -240,4 +256,3 @@ void loop() {
   }
 
 }
-
