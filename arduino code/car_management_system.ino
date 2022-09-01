@@ -229,6 +229,8 @@ void loop() {
         distance = 0.0343 * (travel_time / 2);
         
     }
+
+    delay(dt);
     Serial.println("car passed");
     
     Serial.println(distance);
