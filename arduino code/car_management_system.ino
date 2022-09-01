@@ -42,6 +42,8 @@ int car_space_left = 20;
 int car_distance = 10;
 int car_count;
 
+int barrier_state;
+
 int dt = 1000;
 int ultrasonic_dt = 10;
 int stepper_dt = 15;
@@ -102,6 +104,8 @@ void getKey(byte *buffer, byte bufferSize) {
 
 void loop() {
   
+  barrier_state = 0;
+  
   digitalWrite(trig, LOW);
   delayMicroseconds(ultrasonic_dt);
 
@@ -112,10 +116,9 @@ void loop() {
   travel_time = pulseIn(echo, HIGH);
   distance = 0.0343 * (travel_time / 2);
 
-  Serial.println(distance);
-  delay(dt);
+  Serial.println(barrier_state);
 
-  if (distance <= car_distance) {
+  if ((distance <= car_distance) && (barrier_state == 0)) {
     
     Serial.println("alarm");
     lcd.clear();
@@ -124,7 +127,6 @@ void loop() {
     
     for (int i = 0; i<=5; i++){
       
-    
       Serial.println("test");
       digitalWrite(buzzer, HIGH);
       delay(dt);
@@ -167,11 +169,20 @@ void loop() {
 
   if ((key == accepted) && (car_space_left > 0)) {
 
+    barrier_state = 1;
+    Serial.println(barrier_state);
+    
     lcd.clear();
     lcd.setCursor(1, 0);
     lcd.print("Access granted");
-    lcd.setCursor(1, 1);
-    lcd.print("Barrier is open");
+
+    delay (dt);
+    
+    lcd.clear();
+    lcd.setCursor(3, 0);
+    lcd.print("Barrier is");
+    lcd.setCursor(5,1);
+    lcd.print("Opening");
 
     digitalWrite(orange, HIGH);
     digitalWrite(purple, LOW);
@@ -199,18 +210,41 @@ void loop() {
     digitalWrite(yellow, LOW);
     digitalWrite(blue, HIGH);
 
-    delay(dt);
+    lcd.clear();
+    lcd.setCursor(3, 0);
+    lcd.print("Barrier is");
+    lcd.setCursor(6,1);
+    lcd.print("Open");
+
+    while (distance > car_distance){
+      
+        digitalWrite(trig, LOW);
+        delayMicroseconds(ultrasonic_dt);
+      
+        digitalWrite(trig, HIGH);
+        delayMicroseconds(ultrasonic_dt);
+        digitalWrite(trig, LOW);
+      
+        travel_time = pulseIn(echo, HIGH);
+        distance = 0.0343 * (travel_time / 2);
+        
+    }
+    Serial.println("car passed");
+    
+    Serial.println(distance);
+//    if (distance <= car_distance) {
+      
+      Serial.print("Number of cars inside is: ");
+      Serial.println(car_count += 1);
+      car_space_left -= 1;
+//    }
 
     lcd.clear();
     lcd.setCursor(3, 0);
     lcd.print("Barrier Is");
     lcd.setCursor(5,1);
     lcd.print("Closing");
-
-    Serial.print("Number of cars inside is: ");
-    Serial.println(car_count += 1);
-    car_space_left -= 1;
-
+    
     digitalWrite(orange, LOW);
     digitalWrite(purple, LOW);
     digitalWrite(yellow, LOW);
@@ -238,6 +272,8 @@ void loop() {
     digitalWrite(blue, LOW);
 
     delay(stepper_dt);
+
+    barrier_state = 0;
 
   }
 
