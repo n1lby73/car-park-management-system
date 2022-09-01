@@ -40,7 +40,6 @@ int buzzer = 8;
 
 int car_space_left = 20;
 int car_distance = 10;
-int car_count;
 
 int barrier_state;
 
@@ -230,23 +229,21 @@ void loop() {
         distance = 0.0343 * (travel_time / 2);
         
     }
-
+    
     delay(car_dt);
     Serial.println("car passed");
     
     Serial.println(distance);
-//    if (distance <= car_distance) {
-      
-      Serial.print("Number of cars inside is: ");
-      Serial.println(car_count += 1);
-      car_space_left -= 1;
-//    }
+          
+    car_space_left -= 1;
 
     lcd.clear();
     lcd.setCursor(3, 0);
     lcd.print("Barrier Is");
     lcd.setCursor(5,1);
     lcd.print("Closing");
+
+    delay(dt);
     
     digitalWrite(orange, LOW);
     digitalWrite(purple, LOW);
