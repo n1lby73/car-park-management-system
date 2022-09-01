@@ -230,6 +230,12 @@ void loop() {
         
     }
     
+    lcd.clear();
+    lcd.setCursor(4, 0);
+    lcd.print("Car Slot");
+    lcd.setCursor(2,1);
+    lcd.print("Reduced By 1");
+    
     delay(car_dt);
     Serial.println("car passed");
     
