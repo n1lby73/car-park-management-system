@@ -38,15 +38,15 @@ int yellow = 6;
 int orange = 7;
 int buzzer = 8;
 
-int car_space_left = 20;
+int car_space_left = 5;
 int car_distance = 10;
-
-int barrier_state;
 
 int dt = 1000;
 int car_dt = 2000;
-int ultrasonic_dt = 10;
+int buzzer_dt =200;
 int stepper_dt = 15;
+int access_denied_dt = 500;
+int ultrasonic_dt = 10;
 
 int distance;
 int travel_time;
@@ -102,10 +102,44 @@ void getKey(byte *buffer, byte bufferSize) {
 
 }
 
+void openBarrier(){
+
+  for(int i =0; i<=2700; i++){
+
+    for (int i =7; i>=4; i--){
+
+      digitalWrite(i,HIGH);
+      
+      delay(stepper_dt);
+      
+      digitalWrite(i,LOW);
+
+      delay(stepper_dt);
+    }
+  }
+  
+}
+
+void closeBarrier(){
+  
+  for(int i = 2700; i >= 0; i--){
+
+    for(int i =4; i<=7; i++){
+
+      digitalWrite(i, HIGH);
+
+      delay(stepper_dt);
+
+      digitalWrite(i,LOW);
+
+      delay(stepper_dt);
+      
+    }
+  }
+}
+
 void loop() {
-  
-  barrier_state = 0;
-  
+    
   digitalWrite(trig, LOW);
   delayMicroseconds(ultrasonic_dt);
 
@@ -116,20 +150,18 @@ void loop() {
   travel_time = pulseIn(echo, HIGH);
   distance = 0.0343 * (travel_time / 2);
 
-  if ((distance <= car_distance) && (barrier_state == 0)) {
-    
-    Serial.println("alarm");
+  if (distance <= car_distance) {
+        
     lcd.clear();
     lcd.setCursor(1, 0);
     lcd.print("Security Alert");
     
     for (int i = 0; i<=5; i++){
       
-      Serial.println("test");
       digitalWrite(buzzer, HIGH);
-      delay(dt);
+      delay(buzzer_dt);
       digitalWrite(buzzer, LOW);
-      delay(dt);
+      delay(buzzer_dt);
    }
    
   }
@@ -166,9 +198,6 @@ void loop() {
   getKey(mfrc522.uid.uidByte, mfrc522.uid.size);
 
   if ((key == accepted) && (car_space_left > 0)) {
-
-    barrier_state = 1;
-    Serial.println(barrier_state);
     
     lcd.clear();
     lcd.setCursor(1, 0);
@@ -182,31 +211,33 @@ void loop() {
     lcd.setCursor(5,1);
     lcd.print("Opening");
 
-    digitalWrite(orange, HIGH);
-    digitalWrite(purple, LOW);
-    digitalWrite(yellow, LOW);
-    digitalWrite(blue, LOW);
-
-    delay(stepper_dt);
-
-    digitalWrite(orange, LOW);
-    digitalWrite(purple, HIGH);
-    digitalWrite(yellow, LOW);
-    digitalWrite(blue, LOW);
-
-    delay(stepper_dt);
-
-    digitalWrite(orange, LOW);
-    digitalWrite(purple, LOW);
-    digitalWrite(yellow, HIGH);
-    digitalWrite(blue, LOW);
-
-    delay(stepper_dt);
-
-    digitalWrite(orange, LOW);
-    digitalWrite(purple, LOW);
-    digitalWrite(yellow, LOW);
-    digitalWrite(blue, HIGH);
+    openBarrier();
+    
+//    digitalWrite(orange, HIGH);
+//    digitalWrite(purple, LOW);
+//    digitalWrite(yellow, LOW);
+//    digitalWrite(blue, LOW);
+//
+//    delay(stepper_dt);
+//
+//    digitalWrite(orange, LOW);
+//    digitalWrite(purple, HIGH);
+//    digitalWrite(yellow, LOW);
+//    digitalWrite(blue, LOW);
+//
+//    delay(stepper_dt);
+//
+//    digitalWrite(orange, LOW);
+//    digitalWrite(purple, LOW);
+//    digitalWrite(yellow, HIGH);
+//    digitalWrite(blue, LOW);
+//
+//    delay(stepper_dt);
+//
+//    digitalWrite(orange, LOW);
+//    digitalWrite(purple, LOW);
+//    digitalWrite(yellow, LOW);
+//    digitalWrite(blue, HIGH);
 
     delay(dt);
 
@@ -237,9 +268,6 @@ void loop() {
     lcd.print("Reduced By 1");
     
     delay(car_dt);
-    Serial.println("car passed");
-    
-    Serial.println(distance);
           
     car_space_left -= 1;
 
@@ -249,99 +277,76 @@ void loop() {
     lcd.setCursor(5,1);
     lcd.print("Closing");
 
+    closeBarrier();
+
     delay(dt);
     
-    digitalWrite(orange, LOW);
-    digitalWrite(purple, LOW);
-    digitalWrite(yellow, LOW);
-    digitalWrite(blue, HIGH);
-
-    delay(stepper_dt);
-
-    digitalWrite(orange, LOW);
-    digitalWrite(purple, LOW);
-    digitalWrite(yellow, HIGH);
-    digitalWrite(blue, LOW);
-
-    delay(stepper_dt);
-
-    digitalWrite(orange, LOW);
-    digitalWrite(purple, HIGH);
-    digitalWrite(yellow, LOW);
-    digitalWrite(blue, LOW);
-
-    delay(stepper_dt);
-
-    digitalWrite(orange, HIGH);
-    digitalWrite(purple, LOW);
-    digitalWrite(yellow, LOW);
-    digitalWrite(blue, LOW);
-
-    delay(stepper_dt);
-
-    barrier_state = 0;
+//    digitalWrite(orange, LOW);
+//    digitalWrite(purple, LOW);
+//    digitalWrite(yellow, LOW);
+//    digitalWrite(blue, HIGH);
+//
+//    delay(stepper_dt);
+//
+//    digitalWrite(orange, LOW);
+//    digitalWrite(purple, LOW);
+//    digitalWrite(yellow, HIGH);
+//    digitalWrite(blue, LOW);
+//
+//    delay(stepper_dt);
+//
+//    digitalWrite(orange, LOW);
+//    digitalWrite(purple, HIGH);
+//    digitalWrite(yellow, LOW);
+//    digitalWrite(blue, LOW);
+//
+//    delay(stepper_dt);
+//
+//    digitalWrite(orange, HIGH);
+//    digitalWrite(purple, LOW);
+//    digitalWrite(yellow, LOW);
+//    digitalWrite(blue, LOW);
+//
+//    delay(stepper_dt);
 
   }
 
 
-  else if ((key == accepted) && (car_space_left<= 0)) {
+    else if (car_space_left<= 0) {
     
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Car Park Is Full");
-    lcd.setCursor(0, 1);
-    lcd.print("Access granted");
     
   }
+//  else if ((key == accepted) && (car_space_left<= 0)) {
+//    
+//    lcd.clear();
+//    lcd.setCursor(0, 0);
+//    lcd.print("Car Park Is Full");
+//    lcd.setCursor(0, 1);
+//    lcd.print("Access granted");
+//    
+//  }
 
-  else if ((key != accepted) && (car_space_left <= 0)) {
-
-    lcd.clear();
-    lcd.setCursor(0, 0);
-    lcd.print("Car Park Is Full");
-    
-    lcd.setCursor(0, 1);
-    lcd.print("Access denied");
-    
-  }
+//  else if ((key != accepted) && (car_space_left <= 0)) {
+//
+//    lcd.clear();
+//    lcd.setCursor(0, 0);
+//    lcd.print("Car Park Is Full");
+//    
+//    lcd.setCursor(0, 1);
+//    lcd.print("Access denied");
+//    
+//  }
   
   else {
 
     lcd.clear();
     lcd.setCursor(1, 0);
     lcd.print("Access denied");
-
-    for (int i = 0; i<=5; i++){
-      
-        digitalWrite(trig, LOW);
-        delayMicroseconds(ultrasonic_dt);
-      
-        digitalWrite(trig, HIGH);
-        delayMicroseconds(ultrasonic_dt);
-        digitalWrite(trig, LOW);
-      
-        travel_time = pulseIn(echo, HIGH);
-        distance = 0.0343 * (travel_time / 2);
-
-      if (distance <= car_distance) {
-        
-        Serial.println("alarm");
-        lcd.clear();
-        lcd.setCursor(1, 0);
-        lcd.print("Security Alert");
-        
-        for (int i = 0; i<=5; i++){
-          
-          Serial.println("test");
-          digitalWrite(buzzer, HIGH);
-          delay(dt);
-          digitalWrite(buzzer, LOW);
-          delay(dt);
-       }
-       
-      }
-   }
-    delay(dt);
+  
+    delay(access_denied_dt);
   }
 
 }
