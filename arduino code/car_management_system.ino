@@ -300,7 +300,8 @@ void loop() {
 
     closeBarrier();
 
-
+  }
+  
   else if (car_space_left <= 0) {
 
     lcd.clear();
