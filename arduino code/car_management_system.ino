@@ -258,15 +258,14 @@ void loop() {
 
     openBarrier();
 
-    delay(dt);
-
     lcd.clear();
     lcd.setCursor(3, 0);
     lcd.print("Barrier is");
     lcd.setCursor(6, 1);
     lcd.print("Open");
 
-    while (distance > car_distance) {
+
+    for (int i = 0; i<=2000; i++) {
 
       digitalWrite(trig, LOW);
       delayMicroseconds(ultrasonic_dt);
@@ -278,17 +277,22 @@ void loop() {
       travel_time = pulseIn(echo, HIGH);
       distance = 0.0343 * (travel_time / 2);
 
+      if (distance <= car_distance){
+
+        lcd.clear();
+        lcd.setCursor(4, 0);
+        lcd.print("Car Slot");
+        lcd.setCursor(2, 1);
+        lcd.print("Reduced By 1");
+    
+        delay(car_dt);
+    
+        car_space_left -= 1;
+
+        break;
+        
+      }
     }
-
-    lcd.clear();
-    lcd.setCursor(4, 0);
-    lcd.print("Car Slot");
-    lcd.setCursor(2, 1);
-    lcd.print("Reduced By 1");
-
-    delay(car_dt);
-
-    car_space_left -= 1;
 
     lcd.clear();
     lcd.setCursor(3, 0);
@@ -301,7 +305,6 @@ void loop() {
     closeBarrier();
 
   }
-  
   else if (car_space_left <= 0) {
 
     lcd.clear();
