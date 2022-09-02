@@ -31,8 +31,11 @@ int d1 = A3;
 int d2 = A4;
 int d3 = A5;
 
-int trig = 2;
-int echo = 3;
+int exit_trig = 0;
+int exit_echo = 1;
+
+int entrance_trig = 2;
+int entrance_echo = 3;
 
 int blue = 4 ;
 int purple = 5;
@@ -62,8 +65,8 @@ void setup() {
   SPI.begin();
   mfrc522.PCD_Init();
 
-  pinMode(trig, OUTPUT);
-  pinMode(echo, INPUT);
+  pinMode(entrance_trig, OUTPUT);
+  pinMode(entrance_echo, INPUT);
 
   pinMode(blue, OUTPUT);
   pinMode(purple, OUTPUT);
@@ -185,14 +188,14 @@ void closeBarrier() {
 
 void loop() {
 
-  digitalWrite(trig, LOW);
+  digitalWrite(entrance_trig, LOW);
   delayMicroseconds(ultrasonic_dt);
 
-  digitalWrite(trig, HIGH);
+  digitalWrite(entrance_trig, HIGH);
   delayMicroseconds(ultrasonic_dt);
-  digitalWrite(trig, LOW);
+  digitalWrite(entrance_trig, LOW);
 
-  travel_time = pulseIn(echo, HIGH);
+  travel_time = pulseIn(entrance_echo, HIGH);
   distance = 0.0343 * (travel_time / 2);
 
   if (distance <= car_distance) {
@@ -267,14 +270,14 @@ void loop() {
 
     for (int i = 0; i<=2000; i++) {
 
-      digitalWrite(trig, LOW);
+      digitalWrite(entrance_trig, LOW);
       delayMicroseconds(ultrasonic_dt);
 
-      digitalWrite(trig, HIGH);
+      digitalWrite(entrance_trig, HIGH);
       delayMicroseconds(ultrasonic_dt);
-      digitalWrite(trig, LOW);
+      digitalWrite(entrance_trig, LOW);
 
-      travel_time = pulseIn(echo, HIGH);
+      travel_time = pulseIn(entrance_echo, HIGH);
       distance = 0.0343 * (travel_time / 2);
 
       if (distance <= car_distance){
