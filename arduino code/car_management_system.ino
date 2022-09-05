@@ -54,8 +54,11 @@ int stepper_dt = 15;
 int access_denied_dt = 500;
 int ultrasonic_dt = 10;
 
-int distance;
-int travel_time;
+int entrance_distance;
+int entrance_ultrasonic_travel_time;
+
+int exit_distance;
+int exit_ultrasonic_travel_time;
 
 LiquidCrystal lcd (rs, en, d0, d1, d2, d3);
 MFRC522 mfrc522(SS_PIN, RST_PIN);
@@ -188,6 +191,8 @@ void closeBarrier() {
 
 void loop() {
 
+  // check for an intuder
+  
   digitalWrite(entrance_trig, LOW);
   delayMicroseconds(ultrasonic_dt);
 
@@ -195,10 +200,10 @@ void loop() {
   delayMicroseconds(ultrasonic_dt);
   digitalWrite(entrance_trig, LOW);
 
-  travel_time = pulseIn(entrance_echo, HIGH);
-  distance = 0.0343 * (travel_time / 2);
+  entrance_ultrasonic_travel_time = pulseIn(entrance_echo, HIGH);
+  entrance_distance = 0.0343 * (entrance_ultrasonic_travel_time / 2);
 
-  if (distance <= car_distance) {
+  if (entrance_distance <= car_distance) {
 
     lcd.clear();
     lcd.setCursor(1, 0);
@@ -214,6 +219,8 @@ void loop() {
 
   }
 
+  // change lcd msg if car park is full
+  
   if (car_space_left <= 0) {
 
     lcd.clear();
@@ -236,15 +243,22 @@ void loop() {
 
   }
 
-
+  // check if card is present
+  
   if ( ! mfrc522.PICC_IsNewCardPresent())
     return;
 
+  //read card key 
+  
   if ( ! mfrc522.PICC_ReadCardSerial())
     return;
 
+  //extract the key that has been read
+  
   getKey(mfrc522.uid.uidByte, mfrc522.uid.size);
 
+  //compare the key to the registered one and permit if car park still have space
+  
   if ((key == accepted) && (car_space_left > 0)) {
 
     lcd.clear();
@@ -277,10 +291,10 @@ void loop() {
       delayMicroseconds(ultrasonic_dt);
       digitalWrite(entrance_trig, LOW);
 
-      travel_time = pulseIn(entrance_echo, HIGH);
-      distance = 0.0343 * (travel_time / 2);
+      entrance_ultrasonic_travel_time = pulseIn(entrance_echo, HIGH);
+      entrance_distance = 0.0343 * (entrance_ultrasonic_travel_time / 2);
 
-      if (distance <= car_distance){
+      if (entrance_distance <= car_distance){
 
         lcd.clear();
         lcd.setCursor(4, 0);
